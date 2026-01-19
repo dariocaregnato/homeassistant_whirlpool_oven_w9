@@ -1,0 +1,15 @@
+{
+    "domain": "whirlpool_sixth_sense",
+    "name": "Whirlpool Sixth Sense",
+    "codeowners": [
+        "@your_github_username"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/your_github_username/home_assistant_whirlpool_sixth_sense",
+    "requirements": [],
+    "ssdp": [],
+    "zeroconf": [],
+    "homekit": {},
+    "dependencies": [],
+    "version": "1.0.0"
+}
