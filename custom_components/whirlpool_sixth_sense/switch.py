@@ -22,25 +22,23 @@ async def async_setup_entry(
     """Set up the switch platform."""
     data = hass.data[DOMAIN][entry.entry_id]
     manager = data["manager"]
-    device_name = data.get("device_name", "Whirlpool")
 
     entities = []
     for oven in manager.ovens:
-        entities.append(WhirlpoolOvenLight(oven, Cavity.Upper, "Upper", device_name))
+        entities.append(WhirlpoolOvenLight(oven, Cavity.Upper, "Upper"))
         # Control Lock is usually global for the appliance
-        entities.append(WhirlpoolControlLock(oven, device_name))
+        entities.append(WhirlpoolControlLock(oven))
     
     async_add_entities(entities)
 
 class WhirlpoolOvenLight(SwitchEntity):
     """Representation of an Oven Light."""
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the switch."""
         self._oven = oven
         self._cavity = cavity
-        self._device_name = device_name
-        self._attr_name = f"{device_name} Luce" # Renamed from "Light"
+        self._attr_name = f"{oven.name} Luce" # Renamed from "Light"
         self._attr_unique_id = f"{oven.said}_{cavity_name}_light"
         self._attr_icon = "mdi:lightbulb"
 
@@ -75,12 +73,11 @@ class WhirlpoolOvenLight(SwitchEntity):
 class WhirlpoolControlLock(SwitchEntity):
     """Representation of Control Lock."""
 
-    def __init__(self, oven: Oven, device_name: str) -> None:
+    def __init__(self, oven: Oven) -> None:
         """Initialize the switch."""
         self._oven = oven
-        self._device_name = device_name
         # Renamed from "Control Lock"
-        self._attr_name = f"{device_name} Blocco tasti" 
+        self._attr_name = f"{oven.name} Blocco tasti" 
         self._attr_unique_id = f"{oven.said}_control_lock"
         self._attr_icon = "mdi:lock"
 

@@ -20,11 +20,10 @@ async def async_setup_entry(
     """Set up the number platform."""
     data = hass.data[DOMAIN][entry.entry_id]
     manager = data["manager"]
-    device_name = data.get("device_name", "Whirlpool")
 
     entities = []
     for oven in manager.ovens:
-        entities.append(WhirlpoolOvenTimerNumber(oven, Cavity.Upper, "Upper", device_name))
+        entities.append(WhirlpoolOvenTimerNumber(oven, Cavity.Upper, "Upper"))
     
     async_add_entities(entities)
 
@@ -40,12 +39,11 @@ class WhirlpoolOvenTimerNumber(NumberEntity):
     _attr_native_step = 1
     _attr_mode = "box"
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the number entity."""
         self._oven = oven
         self._cavity = cavity
-        self._device_name = device_name
-        self._attr_name = f"{device_name} Timer"
+        self._attr_name = f"{oven.name} Timer"
         self._attr_unique_id = f"{oven.said}_{cavity_name}_timer"
         self._debounce_task = None
         self._local_value = None
@@ -54,7 +52,7 @@ class WhirlpoolOvenTimerNumber(NumberEntity):
     def device_info(self) -> DeviceInfo:
         return DeviceInfo(
             identifiers={(DOMAIN, self._oven.said)},
-            name=self._device_name,
+            name=self._oven.name,
             manufacturer=BRAND,
             model=self._oven.appliance_info.data_model,
         )

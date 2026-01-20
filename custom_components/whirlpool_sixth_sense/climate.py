@@ -10,7 +10,7 @@ from homeassistant.components.climate import (
     PRESET_NONE,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature, ATTR_TEMPERATURE, CONF_NAME
+from homeassistant.const import UnitOfTemperature, ATTR_TEMPERATURE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, async_get_current_platform
@@ -66,12 +66,10 @@ async def async_setup_entry(
     data = hass.data[DOMAIN][entry.entry_id]
     manager = data["manager"]
 
-    device_name = data.get("device_name", "Whirlpool")
-
     entities = []
     for oven in manager.ovens:
         # Assuming single cavity for simplicity, or we could loop cavities
-        entities.append(WhirlpoolOven(oven, Cavity.Upper, "Upper", device_name))
+        entities.append(WhirlpoolOven(oven, Cavity.Upper, "Upper"))
     
     async_add_entities(entities)
 
@@ -118,14 +116,13 @@ class WhirlpoolOven(ClimateEntity):
         PRESET_NONE
     ]
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the oven."""
         self._oven = oven
         self._cavity = cavity
         self._cavity_name = cavity_name
-        self._attr_name = device_name
+        self._attr_name = f"{oven.name} Forno" # Renamed
         self._attr_unique_id = f"{oven.said}_{cavity_name}_climate"
-        self._device_name = device_name
         self._last_preset = PRESET_BAKE # Default to Static on first turn on
         self._current_preset_name = PRESET_NONE # Track manual/custom presets locally
 
@@ -134,7 +131,7 @@ class WhirlpoolOven(ClimateEntity):
         """Return the device info."""
         return DeviceInfo(
             identifiers={(DOMAIN, self._oven.said)},
-            name=self._device_name,
+            name=self._oven.name,
             manufacturer=BRAND,
             model=self._oven.appliance_info.data_model or "Sixth Sense Appliance",
         )

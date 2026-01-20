@@ -24,27 +24,25 @@ async def async_setup_entry(
     """Set up the button platform."""
     data = hass.data[DOMAIN][entry.entry_id]
     manager = data["manager"]
-    device_name = data.get("device_name", "Whirlpool")
 
     entities = []
     for oven in manager.ovens:
         for mins in ADJUSTMENTS:
-            entities.append(WhirlpoolTimerButton(oven, mins, device_name))
+            entities.append(WhirlpoolTimerButton(oven, mins))
     
     async_add_entities(entities)
 
 class WhirlpoolTimerButton(ButtonEntity):
     """Button to adjust timer duration relatively."""
 
-    def __init__(self, oven: Oven, minutes: int, device_name: str) -> None:
+    def __init__(self, oven: Oven, minutes: int) -> None:
         """Initialize the button."""
         self._oven = oven
         self._minutes = minutes
-        self._device_name = device_name
         sign = "+" if minutes > 0 else ""
         action = "add" if minutes > 0 else "sub"
         action_label = "Add" if minutes > 0 else "Subtract"
-        self._attr_name = f"{device_name} Timer {abs(minutes)}m {action_label}"
+        self._attr_name = f"{oven.name} Timer {abs(minutes)}m {action_label}"
         self._attr_unique_id = f"{oven.said}_timer_{action}_{abs(minutes)}m"
         self._attr_icon = "mdi:timer-plus" if minutes > 0 else "mdi:timer-minus"
 
@@ -52,7 +50,7 @@ class WhirlpoolTimerButton(ButtonEntity):
     def device_info(self) -> DeviceInfo:
         return DeviceInfo(
             identifiers={(DOMAIN, self._oven.said)},
-            name=self._device_name,
+            name=self._oven.name,
             manufacturer=BRAND,
             model=self._oven.appliance_info.data_model,
         )

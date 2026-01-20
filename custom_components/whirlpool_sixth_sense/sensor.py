@@ -32,26 +32,24 @@ async def async_setup_entry(
     """Set up the sensor platform."""
     data = hass.data[DOMAIN][entry.entry_id]
     manager = data["manager"]
-    device_name = data.get("device_name", "Whirlpool")
 
     entities = []
     for oven in manager.ovens:
-        entities.append(WhirlpoolOvenStateSensor(oven, Cavity.Upper, "Upper", device_name))
+        entities.append(WhirlpoolOvenStateSensor(oven, Cavity.Upper, "Upper"))
         # Restored the read-only timer sensor in hh:mm:ss format as requested
-        entities.append(WhirlpoolOvenTimerSensor(oven, Cavity.Upper, "Upper", device_name))
-        entities.append(WhirlpoolOvenCookTimeStatusSensor(oven, Cavity.Upper, "Upper", device_name))
+        entities.append(WhirlpoolOvenTimerSensor(oven, Cavity.Upper, "Upper"))
+        entities.append(WhirlpoolOvenCookTimeStatusSensor(oven, Cavity.Upper, "Upper"))
     
     async_add_entities(entities)
 
 class WhirlpoolOvenStateSensor(SensorEntity):
     """Representation of an Oven State Sensor."""
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the sensor."""
         self._oven = oven
         self._cavity = cavity
-        self._device_name = device_name
-        self._attr_name = f"{device_name} Stato"
+        self._attr_name = f"{oven.name} Forno Stato"
         self._attr_unique_id = f"{oven.said}_{cavity_name}_state"
 
     @property
@@ -80,12 +78,11 @@ class WhirlpoolOvenTimerSensor(SensorEntity):
     """Representation of an Oven Timer Sensor (hh:mm:ss)."""
     _attr_icon = "mdi:timer"
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the sensor."""
         self._oven = oven
         self._cavity = cavity
-        self._device_name = device_name
-        self._attr_name = f"{device_name} Timer Display"
+        self._attr_name = f"{oven.name} Forno Timer Display"
         self._attr_unique_id = f"{oven.said}_{cavity_name}_timer_display"
 
     @property
@@ -128,12 +125,11 @@ class WhirlpoolOvenCookTimeStatusSensor(SensorEntity):
     """Sensor for cooking cycle completion status."""
     _attr_icon = "mdi:progress-check"
 
-    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str, device_name: str) -> None:
+    def __init__(self, oven: Oven, cavity: Cavity, cavity_name: str) -> None:
         """Initialize the sensor."""
         self._oven = oven
         self._cavity = cavity
-        self._device_name = device_name
-        self._attr_name = f"{device_name} Fine cottura"
+        self._attr_name = f"{oven.name} Fine cottura"
         self._attr_unique_id = f"{oven.said}_{cavity_name}_cook_time_status"
 
     @property

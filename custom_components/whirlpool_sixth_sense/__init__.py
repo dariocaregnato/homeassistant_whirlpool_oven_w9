@@ -6,7 +6,7 @@ import sys
 import os
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_REGION, CONF_NAME, Platform
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_REGION, Platform
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
@@ -30,7 +30,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     region_key = entry.data[CONF_REGION]
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
-    device_name = entry.data.get(CONF_NAME, "Whirlpool")
 
     # Defaults to Whirlpool and EU if not specified, but valid region is required
     region = Region.EU if region_key == "EU" else Region.US
@@ -47,8 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data[DOMAIN][entry.entry_id] = {
         "manager": manager,
-        "auth": auth,
-        "device_name": device_name
+        "auth": auth
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

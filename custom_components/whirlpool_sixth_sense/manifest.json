@@ -5,7 +5,7 @@
         "@your_github_username"
     ],
     "config_flow": true,
-    "documentation": "https://github.com/your_github_username/home_assistant_whirlpool_sixth_sense",
+    "documentation": "https://www.home-assistant.io/integrations/whirlpool",
     "requirements": [],
     "ssdp": [],
     "zeroconf": [],
